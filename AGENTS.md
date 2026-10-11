@@ -29,7 +29,7 @@ GainLab — MVP украинского интернет-магазина спо�
 - GitHub: `https://github.com/but0672091016-glitch/gainlab`.
 - Публичный тестовый сайт: `https://magical-belekoy-ed4358.netlify.app`.
 - Netlify-проект: `magical-belekoy-ed4358`; production-ветка — `main`.
-- Сборка: `pnpm build`, каталог публикации, определённый адаптером Next.js, — `.next`, Node.js — 22.
+- Сборка: `pnpm db:generate && pnpm build`, каталог публикации, определённый адаптером Next.js, — `.next`, Node.js — 22. Явная генерация Prisma обязательна, поскольку Netlify может восстановить кеш зависимостей без повторного `postinstall`.
 - Для текущей демоверсии переменные окружения на Netlify не требуются. Перед подключением PostgreSQL необходимо отдельно настроить production `DATABASE_URL` и миграции.
 
 ## Структура проекта
