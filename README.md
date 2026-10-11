@@ -35,7 +35,7 @@ corepack prepare pnpm@11.25.0 --activate
 
 Покупать домен или хостинг для разработки не нужно.
 
-Для бесплатной тестовой публикации текущей full-stack архитектуры рекомендуется Netlify. Проект подготовлен к сборке на этой платформе, но не опубликован. Пошаговые требования и сравнение с Cloudflare Pages описаны в [`DEPLOYMENT.md`](DEPLOYMENT.md).
+Публичная тестовая версия размещена бесплатно на Netlify: [magical-belekoy-ed4358.netlify.app](https://magical-belekoy-ed4358.netlify.app). Исходный код хранится в [GitHub-репозитории](https://github.com/but0672091016-glitch/gainlab). Параметры развёртывания и сравнение с Cloudflare Pages описаны в [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ## Быстрый просмотр только интерфейса
 
