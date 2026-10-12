@@ -192,8 +192,8 @@ export function CatalogStorefront({ categories, sections, products, initialCateg
     <main className="min-h-screen bg-mist text-ink">
       <header className="border-b border-white/10 bg-ink text-white">
         <div className="mx-auto flex max-w-[1460px] items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="/" aria-label="GainLab — на головну" className="shrink-0">
-            <Image src="/brand/gainlab-logo.jpg" alt="GainLab" width={720} height={720} className="h-16 w-36 object-cover object-center mix-blend-screen sm:h-20 sm:w-48" priority />
+          <Link href="/" aria-label="GainLab — на головну" className="relative block h-[92px] w-40 shrink-0 overflow-hidden bg-ink sm:h-[124px] sm:w-[214px]">
+            <Image src="/brand/gainlab-logo.jpg" alt="GainLab" width={720} height={720} className="absolute -left-3 -top-9 h-[172px] w-[172px] max-w-none mix-blend-screen sm:-left-[18px] sm:-top-[49px] sm:h-[230px] sm:w-[230px]" priority />
           </Link>
           <div className="ml-auto flex items-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-bold">
             <ShoppingCart className="text-neon" size={20} />
