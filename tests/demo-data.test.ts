@@ -39,3 +39,15 @@ test("every catalog section contains correctly assigned test products", () => {
     catalogSections.map((section) => section.id).sort(),
   );
 });
+
+test("every demo product has meaningful card content and valid options", () => {
+  for (const product of products) {
+    assert.ok(product.summary.trim().length >= 40, `${product.id} needs a useful summary`);
+
+    if (product.options) {
+      assert.ok(product.optionLabel, `${product.id} needs an option label`);
+      assert.ok(product.options.length >= 2, `${product.id} needs multiple options`);
+      assert.equal(new Set(product.options).size, product.options.length, `${product.id} options must be unique`);
+    }
+  }
+});

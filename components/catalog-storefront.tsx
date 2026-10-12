@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft,
+  ArrowRight,
   Backpack,
   Dumbbell,
   FlaskConical,
@@ -68,7 +69,7 @@ function CatalogProductCard({
   }[product.stock];
 
   return (
-    <article className="card-lift group relative flex min-h-[430px] flex-col overflow-hidden rounded-3xl border border-black/8 bg-white p-4 shadow-[0_18px_60px_rgba(11,13,14,.06)]">
+    <article className="card-lift group relative flex min-h-[500px] flex-col overflow-hidden rounded-3xl border border-black/8 bg-white p-4 shadow-[0_18px_60px_rgba(11,13,14,.06)]">
       <span className="absolute left-4 top-4 z-10 rounded-full bg-neon px-3 py-1 text-[10px] font-black uppercase tracking-[0.13em] text-ink">
         Тестовий товар
       </span>
@@ -81,18 +82,20 @@ function CatalogProductCard({
         <Heart size={18} fill={favorite ? "currentColor" : "none"} />
       </button>
 
-      <div className={`relative grid h-52 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br ${tone.panel}`}>
+      <Link href={`/product/${product.slug}`} aria-label={`Відкрити тестову сторінку ${product.name}`} className={`relative grid h-52 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br ${tone.panel}`}>
         <p className="display-face absolute bottom-2 left-3 max-w-[88%] truncate text-5xl text-black/[.055]">{product.artLabel}</p>
         <div className="grid size-24 place-items-center rounded-[2rem] border border-black/8 bg-white/72 shadow-[0_18px_44px_rgba(11,13,14,.13)] backdrop-blur">
           <ProductIcon className={tone.accent} size={54} strokeWidth={1.7} />
         </div>
-      </div>
+      </Link>
 
       <div className="flex flex-1 flex-col pt-4">
         <p className="text-[10px] font-black uppercase tracking-[0.16em] text-muted">{product.brand}</p>
-        <h2 className="mt-1 text-lg font-black tracking-tight text-ink">{product.name}</h2>
+        <h2 className="mt-1 text-lg font-black tracking-tight text-ink"><Link href={`/product/${product.slug}`} className="transition hover:text-[#5f8500]">{product.name}</Link></h2>
         <p className="mt-1 text-sm text-muted">{product.packageLabel}</p>
+        <p className="mt-3 text-sm leading-5 text-muted">{product.summary}</p>
         <p className={`mt-2 text-xs font-bold ${product.stock === "out" ? "text-red-600" : "text-[#4f7600]"}`}>{stockLabel}</p>
+        <Link href={`/product/${product.slug}`} className="mt-3 inline-flex items-center gap-1.5 text-xs font-black text-[#5f8500] hover:text-ink">Докладніше <ArrowRight size={15} /></Link>
         <div className="mt-auto flex items-end justify-between gap-3 pt-5">
           <div>
             <p className="text-2xl font-black tracking-tight text-ink">{formatMoney(product.price)}</p>

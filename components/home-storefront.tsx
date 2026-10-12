@@ -133,7 +133,7 @@ function ProductCard({
   }[product.stock];
 
   return (
-    <article className="card-lift group relative flex min-h-[430px] flex-col overflow-hidden rounded-3xl border border-black/8 bg-white p-4">
+    <article className="card-lift group relative flex min-h-[500px] flex-col overflow-hidden rounded-3xl border border-black/8 bg-white p-4">
       <span className="absolute left-4 top-4 z-10 rounded-full bg-neon px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-ink">
         Тестовий товар
       </span>
@@ -147,16 +147,18 @@ function ProductCard({
       >
         <Heart size={18} fill={favorite ? "currentColor" : "none"} />
       </button>
-      <div className="rounded-2xl bg-[radial-gradient(circle_at_50%_35%,#ffffff_0%,#eef0f1_58%,#dfe3e5_100%)] pt-7">
+      <Link href={`/product/${product.slug}`} aria-label={`Відкрити тестову сторінку ${product.name}`} className="rounded-2xl bg-[radial-gradient(circle_at_50%_35%,#ffffff_0%,#eef0f1_58%,#dfe3e5_100%)] pt-7">
         <ProductArt product={product} />
-      </div>
+      </Link>
       <div className="flex flex-1 flex-col pt-4">
         <p className="text-[11px] font-black uppercase tracking-[0.16em] text-muted">{product.brand}</p>
-        <h3 className="mt-1 text-lg font-black tracking-tight text-ink">{product.name}</h3>
+        <h3 className="mt-1 text-lg font-black tracking-tight text-ink"><Link href={`/product/${product.slug}`} className="transition hover:text-[#5f8500]">{product.name}</Link></h3>
         <p className="mt-1 text-sm text-muted">{product.packageLabel}</p>
+        <p className="mt-3 min-h-[3.75rem] overflow-hidden text-sm leading-5 text-muted [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">{product.summary}</p>
         <p className={`mt-2 text-xs font-bold ${product.stock === "out" ? "text-red-600" : "text-[#4f7600]"}`}>
           {stockLabel}
         </p>
+        <Link href={`/product/${product.slug}`} className="mt-3 inline-flex items-center gap-1.5 text-xs font-black text-[#5f8500] hover:text-ink">Докладніше <ArrowRight size={15} /></Link>
         <div className="mt-auto flex items-end justify-between gap-3 pt-5">
           <div>
             <p className="text-2xl font-black tracking-tight text-ink">{formatMoney(product.price)}</p>
