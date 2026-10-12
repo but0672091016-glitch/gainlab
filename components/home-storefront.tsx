@@ -10,25 +10,19 @@ import {
   BadgePercent,
   Boxes,
   CheckCircle2,
-  ChevronRight,
-  CircleUserRound,
   Dumbbell,
   ExternalLink,
   FlaskConical,
   Headphones,
   Heart,
-  Menu,
   Newspaper,
   PackageCheck,
-  Search,
   ShieldCheck,
   Shirt,
   ShoppingCart,
   Tags,
   Truck,
-  X,
 } from "lucide-react";
-import { catalogSections } from "@/lib/demo-data";
 import type { DemoCategory, DemoProduct, ProductTag } from "@/lib/demo-data";
 import type { SportNewsItem } from "@/lib/sports-news";
 import { useDemoCart } from "@/components/demo-cart";
@@ -181,22 +175,12 @@ function ProductCard({
 }
 
 export function HomeStorefront({ categories, products, sportsNews }: HomeStorefrontProps) {
-  const { addItem, itemCount, openCart } = useDemoCart();
+  const { addItem } = useDemoCart();
   const [activeTab, setActiveTab] = useState<ProductTag>("hits");
-  const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [catalogOpen, setCatalogOpen] = useState(false);
   const [notice, setNotice] = useState("");
 
-  const visibleProducts = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase("uk-UA");
-    return products.filter((product) => {
-      const matchesTab = product.tags.includes(activeTab);
-      const matchesQuery = !normalized || `${product.brand} ${product.name} ${product.packageLabel}`.toLocaleLowerCase("uk-UA").includes(normalized);
-      return matchesTab && matchesQuery;
-    });
-  }, [activeTab, products, query]);
+  const visibleProducts = useMemo(() => products.filter((product) => product.tags.includes(activeTab)), [activeTab, products]);
 
   const notify = (message: string) => {
     setNotice(message);
@@ -224,69 +208,6 @@ export function HomeStorefront({ categories, products, sportsNews }: HomeStorefr
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-mist">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/95 text-white backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1460px] items-center gap-4 px-4 py-2 sm:px-6 lg:px-8">
-          <Link href="/" className="relative z-10 h-[94px] w-[166px] shrink-0 overflow-hidden sm:h-[112px] sm:w-[194px]" aria-label="GainLab — на головну">
-            <Image src="/brand/gainlab-logo.jpg" alt="GainLab — лабораторія твого прогресу" width={230} height={230} priority className="absolute -left-1.5 -top-[42px] h-[178px] w-[178px] max-w-none mix-blend-screen sm:-left-4 sm:-top-[44px] sm:h-[210px] sm:w-[210px]" />
-            <span className="absolute inset-x-0 bottom-0 bg-black py-1 text-center text-[7px] font-black uppercase leading-none tracking-[0.1em] text-white sm:hidden">Лабораторія твого прогресу</span>
-          </Link>
-          <label className="hidden h-12 flex-1 items-center overflow-hidden rounded-xl bg-white lg:flex">
-            <Search className="ml-4 text-black/45" size={19} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Пошук тестових товарів і брендів" className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm text-ink outline-none placeholder:text-black/40" />
-            <a href="#popular" className="grid h-full w-14 place-items-center bg-neon text-ink" aria-label="Перейти до результатів пошуку"><ArrowRight size={19} /></a>
-          </label>
-          <div className="ml-auto flex items-center gap-1 sm:gap-2">
-            <button type="button" onClick={() => notify("Особистий кабінет буде реалізовано на наступному етапі")} className="hidden cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold hover:bg-white/8 md:flex"><CircleUserRound size={20} /> Увійти</button>
-            <button type="button" onClick={() => notify(`В обраному: ${favorites.size}`)} className="relative grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label="Обране"><Heart size={22} />{favorites.size > 0 ? <span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{favorites.size}</span> : null}</button>
-            <button type="button" onClick={openCart} className="relative grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`}><ShoppingCart size={22} />{itemCount > 0 ? <span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{itemCount}</span> : null}</button>
-            <button type="button" onClick={() => setMobileOpen((value) => !value)} className="grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8 lg:hidden" aria-label="Відкрити меню">{mobileOpen ? <X size={24} /> : <Menu size={24} />}</button>
-          </div>
-        </div>
-
-        <nav className="relative border-t border-white/8">
-          <div className="mx-auto hidden max-w-[1460px] grid-cols-[210px_minmax(0,1fr)] px-4 sm:px-6 lg:grid lg:px-8">
-            <div aria-hidden="true" />
-            <div className="flex min-w-0 items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <button type="button" onClick={() => setCatalogOpen((value) => !value)} aria-expanded={catalogOpen} aria-controls="desktop-catalog-menu" className="mr-2 flex shrink-0 cursor-pointer items-center gap-2 bg-neon px-4 py-3 text-xs font-black text-ink xl:mr-3 xl:gap-3 xl:px-5 xl:text-sm"><Menu size={18} /> Каталог товарів <ChevronRight className={`transition-transform ${catalogOpen ? "rotate-90" : ""}`} size={17} /></button>
-              {categories.map((category) => <Link key={category.id} href={category.href} className="shrink-0 px-2 py-3 text-xs font-bold text-white/78 transition hover:text-neon xl:px-3 xl:text-sm">{category.name}</Link>)}
-              {["Акції", "Новинки"].map((item) => <a key={item} href="#popular" className="shrink-0 px-2 py-3 text-xs font-bold text-white/78 transition hover:text-neon xl:px-3 xl:text-sm">{item}</a>)}
-            </div>
-          </div>
-          {catalogOpen ? (
-            <div id="desktop-catalog-menu" className="absolute left-0 right-0 top-full hidden border-y border-white/10 bg-[#101314]/98 shadow-[0_28px_70px_rgba(0,0,0,.48)] lg:block">
-              <div className="mx-auto grid max-w-[1460px] gap-7 px-8 py-7 lg:grid-cols-4">
-                {categories.filter((category) => category.id !== "brands").map((category) => (
-                  <section key={category.id} aria-labelledby={`menu-${category.id}`}>
-                    <Link id={`menu-${category.id}`} href={category.href} onClick={() => setCatalogOpen(false)} className="flex items-center justify-between border-b border-white/10 pb-3 text-sm font-black text-neon hover:text-white">
-                      {category.name}<ChevronRight size={16} />
-                    </Link>
-                    <div className="mt-3 grid gap-1">
-                      {catalogSections.filter((section) => section.categoryId === category.id).map((section) => (
-                        <Link key={section.id} href={section.href} onClick={() => setCatalogOpen(false)} className="group rounded-xl px-3 py-2 transition hover:bg-white/6">
-                          <span className="block text-sm font-bold text-white/82 group-hover:text-neon">{section.name}</span>
-                          <span className="mt-0.5 block text-[11px] leading-4 text-white/38">{section.description}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            </div>
-          ) : null}
-          {mobileOpen ? (
-            <div className="border-t border-white/8 px-4 py-4 lg:hidden">
-              <label className="flex h-12 items-center rounded-xl bg-white"><Search className="ml-4 text-black/45" size={19} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Пошук товарів" className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm text-ink outline-none" /></label>
-              <button type="button" onClick={() => setCatalogOpen((value) => !value)} aria-expanded={catalogOpen} aria-controls="mobile-catalog-menu" className="mt-3 flex w-full cursor-pointer items-center justify-between rounded-xl bg-neon px-4 py-3 text-sm font-black text-ink">Каталог товарів <ChevronRight className={`transition-transform ${catalogOpen ? "rotate-90" : ""}`} size={17} /></button>
-              {catalogOpen ? (
-                <div id="mobile-catalog-menu" className="mt-2 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/5 p-2">
-                  {catalogSections.filter((section) => section.categoryId === "nutrition").map((section) => <Link key={section.id} href={section.href} onClick={() => { setCatalogOpen(false); setMobileOpen(false); }} className="rounded-xl px-3 py-2 text-xs font-bold text-white/82 hover:bg-white/8 hover:text-neon">{section.name}</Link>)}
-                </div>
-              ) : null}
-              <div className="mt-3 grid gap-1">{categories.map((category) => <Link key={category.id} href={category.href} onClick={() => { setCatalogOpen(false); setMobileOpen(false); }} className="rounded-xl px-3 py-3 text-sm font-bold text-white/85 hover:bg-white/8 hover:text-neon">{category.name}</Link>)}</div>
-            </div>
-          ) : null}
-        </nav>
-      </header>
 
       {notice ? <div className="fixed bottom-5 left-1/2 z-[60] -translate-x-1/2 rounded-xl bg-neon px-5 py-3 text-center text-xs font-black uppercase tracking-[0.08em] text-ink shadow-2xl" aria-live="polite">{notice}</div> : null}
 
@@ -358,9 +279,7 @@ export function HomeStorefront({ categories, products, sportsNews }: HomeStorefr
         <section id="popular" className="bg-white py-16 lg:py-20">
           <div className="mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-[#5f8500]">Демо-вітрина</p><h2 className="display-face mt-2 text-3xl sm:text-5xl">Популярні товари</h2></div><div className="flex max-w-full gap-2 overflow-x-auto pb-1">{tabs.map((tab) => <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`shrink-0 cursor-pointer rounded-full px-4 py-2.5 text-sm font-black transition ${activeTab === tab.id ? "bg-neon text-ink" : "bg-mist text-muted hover:text-ink"}`}>{tab.label}</button>)}</div></div>
-            {query ? <p className="mt-5 text-sm text-muted">Результати для: <strong className="text-ink">{query}</strong></p> : null}
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{visibleProducts.map((product) => <ProductCard key={product.id} product={product} favorite={favorites.has(product.id)} onFavorite={() => toggleFavorite(product)} onCart={() => addToCart(product)} />)}</div>
-            {visibleProducts.length === 0 ? <div className="mt-8 rounded-3xl border border-dashed border-black/15 bg-mist p-10 text-center"><Search className="mx-auto text-muted" /><p className="mt-3 font-black">За цим запитом тестових товарів не знайдено</p><button type="button" onClick={() => setQuery("")} className="mt-4 cursor-pointer text-sm font-bold text-[#5f8500] underline">Очистити пошук</button></div> : null}
           </div>
         </section>
 

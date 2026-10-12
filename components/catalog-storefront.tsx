@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -26,6 +25,7 @@ type CatalogStorefrontProps = {
   products: DemoProduct[];
   initialCategory?: string;
   initialSection?: string;
+  initialQuery?: string;
 };
 
 type CatalogCategory = "all" | DemoProductCategory;
@@ -117,15 +117,15 @@ function CatalogProductCard({
   );
 }
 
-export function CatalogStorefront({ categories, sections, products, initialCategory, initialSection }: CatalogStorefrontProps) {
-  const { addItem, itemCount, openCart } = useDemoCart();
+export function CatalogStorefront({ categories, sections, products, initialCategory, initialSection, initialQuery }: CatalogStorefrontProps) {
+  const { addItem } = useDemoCart();
   const catalogCategories = categories.filter((category) => category.id !== "brands");
   const requestedSection = sections.find((section) => section.id === initialSection);
   const normalizedCategory = requestedSection?.categoryId ?? (catalogCategories.some((category) => category.id === initialCategory) ? (initialCategory as DemoProductCategory) : "all");
   const normalizedSection = requestedSection?.id ?? "all";
   const [activeCategory, setActiveCategory] = useState<CatalogCategory>(normalizedCategory);
   const [activeSection, setActiveSection] = useState<CatalogSection>(normalizedSection);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [sortMode, setSortMode] = useState<SortMode>("featured");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [notice, setNotice] = useState("");
@@ -135,7 +135,7 @@ export function CatalogStorefront({ categories, sections, products, initialCateg
     const filtered = products.filter((product) => {
       const matchesCategory = activeCategory === "all" || product.categoryId === activeCategory;
       const matchesSection = activeSection === "all" || product.sectionId === activeSection;
-      const haystack = `${product.brand} ${product.name} ${product.packageLabel}`.toLocaleLowerCase("uk-UA");
+      const haystack = `${product.brand} ${product.name} ${product.packageLabel} ${product.summary}`.toLocaleLowerCase("uk-UA");
       return matchesCategory && matchesSection && (!normalizedQuery || haystack.includes(normalizedQuery));
     });
 
@@ -194,18 +194,6 @@ export function CatalogStorefront({ categories, sections, products, initialCateg
 
   return (
     <main className="min-h-screen bg-mist text-ink">
-      <header className="border-b border-white/10 bg-ink text-white">
-        <div className="mx-auto flex max-w-[1460px] items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="/" aria-label="GainLab — на головну" className="relative block h-[92px] w-40 shrink-0 overflow-hidden bg-ink sm:h-[124px] sm:w-[214px]">
-            <Image src="/brand/gainlab-logo.jpg" alt="GainLab" width={720} height={720} className="absolute -left-3 -top-9 h-[172px] w-[172px] max-w-none mix-blend-screen sm:-left-[18px] sm:-top-[49px] sm:h-[230px] sm:w-[230px]" priority />
-          </Link>
-          <button type="button" onClick={openCart} aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`} className="ml-auto flex cursor-pointer items-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-bold transition hover:border-neon">
-            <ShoppingCart className="text-neon" size={20} />
-            <span className="hidden sm:inline">Тестовий кошик</span>
-            <span className="grid size-6 place-items-center rounded-full bg-neon text-xs text-ink">{itemCount}</span>
-          </button>
-        </div>
-      </header>
 
       <section className="bg-ink text-white">
         <div className="mx-auto max-w-[1460px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">

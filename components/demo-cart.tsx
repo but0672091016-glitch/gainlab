@@ -126,7 +126,6 @@ export function DemoCartProvider({ children }: { children: ReactNode }) {
       const product = products.find((item) => item.id === input.productId);
       if (!product || product.stock === "out") return;
       replaceCart(addDemoCartLine(cartSnapshot, input));
-      setIsOpen(true);
     },
     openCart: () => setIsOpen(true),
     closeCart: () => setIsOpen(false),

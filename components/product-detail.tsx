@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -8,7 +7,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Backpack,
-  Boxes,
   Check,
   Dumbbell,
   FlaskConical,
@@ -54,7 +52,7 @@ const stockLabels = {
 const formatMoney = (value: number) => `${String(value).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0")} ₴`;
 
 export function ProductDetail({ product, categoryName, sectionName, similarProducts }: ProductDetailProps) {
-  const { addItem, itemCount, openCart } = useDemoCart();
+  const { addItem } = useDemoCart();
   const ProductIcon = categoryIcons[product.categoryId];
   const tone = toneStyles[product.artTone];
   const [selectedOption, setSelectedOption] = useState(product.options?.[0] ?? product.packageLabel);
@@ -75,22 +73,6 @@ export function ProductDetail({ product, categoryName, sectionName, similarProdu
 
   return (
     <main className="min-h-screen bg-mist text-ink">
-      <header className="border-b border-white/10 bg-ink text-white">
-        <div className="mx-auto flex max-w-[1460px] items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="/" aria-label="GainLab — на головну" className="relative block h-[92px] w-40 shrink-0 overflow-hidden bg-ink sm:h-[124px] sm:w-[214px]">
-            <Image src="/brand/gainlab-logo.jpg" alt="GainLab" width={720} height={720} className="absolute -left-3 -top-9 h-[172px] w-[172px] max-w-none mix-blend-screen sm:-left-[18px] sm:-top-[49px] sm:h-[230px] sm:w-[230px]" priority />
-          </Link>
-          <div className="ml-auto flex items-center gap-2">
-            <Link href="/catalog" className="inline-flex size-12 items-center justify-center rounded-2xl border border-white/12 bg-white/5 text-sm font-black transition hover:border-neon hover:text-neon sm:h-12 sm:w-auto sm:px-4">
-              <Boxes size={19} /> <span className="hidden sm:ml-2 sm:inline">До каталогу</span>
-            </Link>
-            <button type="button" onClick={openCart} aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`} className="relative grid size-12 cursor-pointer place-items-center rounded-2xl border border-white/12 bg-white/5 transition hover:border-neon hover:text-neon">
-              <ShoppingCart size={20} />
-              {itemCount > 0 ? <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{itemCount}</span> : null}
-            </button>
-          </div>
-        </div>
-      </header>
 
       <section className="border-b border-black/7 bg-white">
         <div className="mx-auto flex max-w-[1460px] items-center gap-2 overflow-x-auto px-4 py-4 text-xs font-bold text-muted sm:px-6 lg:px-8">

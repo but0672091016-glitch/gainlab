@@ -5,11 +5,11 @@ import { Suspense } from "react";
 async function CatalogContent({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; section?: string }>;
+  searchParams: Promise<{ category?: string; section?: string; query?: string }>;
 }) {
-  const { category, section } = await searchParams;
+  const { category, section, query } = await searchParams;
 
-  return <CatalogStorefront key={`${category ?? "all"}:${section ?? "all"}`} categories={categories} sections={catalogSections} products={products} initialCategory={category} initialSection={section} />;
+  return <CatalogStorefront key={`${category ?? "all"}:${section ?? "all"}:${query ?? ""}`} categories={categories} sections={catalogSections} products={products} initialCategory={category} initialSection={section} initialQuery={query} />;
 }
 
 function CatalogFallback() {
@@ -26,7 +26,7 @@ function CatalogFallback() {
 export default function CatalogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; section?: string }>;
+  searchParams: Promise<{ category?: string; section?: string; query?: string }>;
 }) {
   return (
     <Suspense fallback={<CatalogFallback />}>

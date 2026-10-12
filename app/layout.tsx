@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DemoCartProvider } from "@/components/demo-cart";
+import { StoreHeader } from "@/components/store-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,7 +13,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="uk" className="h-full scroll-smooth" data-scroll-behavior="smooth">
       <body className="min-h-full bg-[#f5f6f7] text-[#0b0d0e] antialiased">
-        <DemoCartProvider>{children}</DemoCartProvider>
+        <DemoCartProvider>
+          <StoreHeader />
+          {children}
+        </DemoCartProvider>
       </body>
     </html>
   );
