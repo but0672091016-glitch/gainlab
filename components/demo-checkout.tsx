@@ -23,19 +23,68 @@ const formatMoney = (value: number) => `${String(value).replace(/\B(?=(\d{3})+(?
 type Confirmation = {
   itemCount: number;
   subtotal: number;
+  sent: boolean;
 };
 
 export function DemoCheckout() {
   const { lines, itemCount, subtotal, clearCart, openCart } = useDemoCart();
   const [deliveryMethod, setDeliveryMethod] = useState<"branch" | "address">("branch");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const submitDemoOrder = (event: FormEvent<HTMLFormElement>) => {
+  const submitDemoOrder = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!itemCount) return;
-    setConfirmation({ itemCount, subtotal });
-    clearCart();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!itemCount || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const formData = new FormData(event.currentTarget);
+    formData.set("form-name", "gainlab-order");
+    formData.set("subject", `Нове тестове замовлення GainLab — ${itemCount} шт.`);
+    formData.set("itemCount", String(itemCount));
+    formData.set(
+      "orderItems",
+      lines
+        .map(
+          (line) =>
+            `${line.product.name} — ${line.option} × ${line.quantity} = ${formatMoney(line.product.price * line.quantity)}`,
+        )
+        .join("\n"),
+    );
+    formData.set("orderTotal", formatMoney(subtotal));
+    formData.set("dataConsent", "Погоджено");
+
+    const encoded = new URLSearchParams();
+    for (const [key, value] of formData.entries()) {
+      if (typeof value === "string") encoded.append(key, value);
+    }
+
+    const isLocalPreview =
+      window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+    try {
+      if (!isLocalPreview) {
+        const response = await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: encoded.toString(),
+        });
+
+        if (!response.ok) throw new Error(`Netlify Forms: ${response.status}`);
+      }
+
+      setConfirmation({ itemCount, subtotal, sent: !isLocalPreview });
+      clearCart();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setSubmitError(
+        "Не вдалося передати тестове замовлення. Перевірте з’єднання та спробуйте ще раз — товари залишилися в кошику.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (confirmation) {
@@ -44,9 +93,13 @@ export function DemoCheckout() {
         <section className="mx-auto max-w-3xl overflow-hidden rounded-[2.5rem] border border-black/7 bg-white shadow-[0_28px_100px_rgba(11,13,14,.1)]">
           <div className="bg-ink px-6 py-10 text-center text-white sm:px-10 sm:py-14">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-neon text-ink"><CheckCircle2 size={38} /></span>
-            <p className="mt-7 text-xs font-black uppercase tracking-[0.2em] text-neon">Демонстрацію завершено</p>
+            <p className="mt-7 text-xs font-black uppercase tracking-[0.2em] text-neon">{confirmation.sent ? "Заявку передано" : "Локальна перевірка завершена"}</p>
             <h1 className="display-face mt-3 text-4xl leading-[.9] sm:text-6xl">Тестове оформлення готове</h1>
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-white/65 sm:text-base">Реальне замовлення не створено, введені дані нікуди не передавалися, оплата не проводилася.</p>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-white/65 sm:text-base">
+              {confirmation.sent
+                ? "Дані тестового замовлення передано до системи заявок. Онлайн-оплата не проводилася."
+                : "Це локальна перевірка інтерфейсу: дані не надсилалися. На опублікованому сайті заявка буде передана адміністратору."}
+            </p>
           </div>
           <div className="grid gap-6 px-6 py-8 sm:grid-cols-2 sm:px-10 sm:py-10">
             <div className="rounded-2xl bg-mist p-5"><p className="text-xs font-black uppercase tracking-[0.14em] text-muted">Товарів у перевірці</p><p className="mt-2 text-3xl font-black">{confirmation.itemCount} шт.</p></div>
@@ -83,19 +136,25 @@ export function DemoCheckout() {
         <div className="mx-auto max-w-[1320px] px-4 py-9 sm:px-6 sm:py-12 lg:px-8">
           <Link href="/catalog" className="inline-flex items-center gap-2 text-sm font-bold text-white/58 transition hover:text-neon"><ArrowLeft size={18} /> Продовжити покупки</Link>
           <div className="mt-7 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-neon">Без передачі даних і оплати</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-neon">Тестова заявка без онлайн-оплати</p>
             <h1 className="display-face mt-3 text-5xl leading-[.88] sm:text-7xl">Тестове оформлення</h1>
-            <p className="mt-5 max-w-2xl text-sm leading-6 text-white/62 sm:text-base">Перевіряємо структуру майбутнього замовлення. Ця форма працює тільки в браузері й не надсилає введені відомості.</p>
+            <p className="mt-5 max-w-2xl text-sm leading-6 text-white/62 sm:text-base">Після підтвердження контактні дані та склад кошика будуть передані до Netlify Forms і збережені як тестова заявка для повідомлення адміністратора.</p>
           </div>
         </div>
       </section>
 
       <div className="mx-auto grid max-w-[1320px] gap-7 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1fr)_420px] lg:px-8">
-        <form id="demo-checkout-form" onSubmit={submitDemoOrder} className="space-y-6">
+        <form id="demo-checkout-form" name="gainlab-order" method="POST" onSubmit={submitDemoOrder} className="space-y-6">
+          <input type="hidden" name="form-name" value="gainlab-order" />
+          <input type="hidden" name="subject" value="Нове тестове замовлення GainLab" />
+          <label className="absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip-path:inset(50%)] [clip:rect(0,0,0,0)]">
+            Не заповнюйте це поле
+            <input name="bot-field" tabIndex={-1} autoComplete="off" />
+          </label>
           <section className="rounded-[2rem] border border-black/7 bg-white p-5 shadow-[0_18px_70px_rgba(11,13,14,.05)] sm:p-7" aria-labelledby="contact-title">
             <div className="flex items-start gap-4">
               <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-neon font-black">01</span>
-              <div><h2 id="contact-title" className="text-xl font-black">Контактні дані</h2><p className="mt-1 text-sm text-muted">Потрібні лише для перевірки форми; вони не зберігаються.</p></div>
+              <div><h2 id="contact-title" className="text-xl font-black">Контактні дані</h2><p className="mt-1 text-sm text-muted">Передаються адміністратору разом зі складом тестового замовлення.</p></div>
             </div>
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
               <label className="text-sm font-black">Ім’я та прізвище<input name="customerName" type="text" minLength={2} maxLength={80} autoComplete="name" required placeholder="Тестовий покупець" className={inputClass} /></label>
@@ -133,8 +192,8 @@ export function DemoCheckout() {
           </section>
 
           <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-black/8 bg-white p-5 text-sm leading-6 shadow-[0_12px_40px_rgba(11,13,14,.04)]">
-            <input type="checkbox" name="demoConsent" required className="mt-1 size-5 shrink-0 accent-[#79aa00]" />
-            <span><strong>Розумію, що це демонстрація.</strong> Замовлення не буде створено, а введені дані не будуть надіслані або збережені.</span>
+            <input type="checkbox" name="dataConsent" value="Погоджено" required className="mt-1 size-5 shrink-0 accent-[#79aa00]" />
+            <span><strong>Погоджуюся на передачу даних.</strong> Контакти та склад кошика будуть передані до Netlify Forms для обробки тестової заявки й email-сповіщення адміністратора. Не вводьте платіжні дані.</span>
           </label>
         </form>
 
@@ -151,11 +210,12 @@ export function DemoCheckout() {
           </div>
           <button type="button" onClick={openCart} className="mt-4 inline-flex cursor-pointer items-center gap-2 text-sm font-black text-[#5f8500] hover:text-ink"><ShoppingCart size={17} /> Змінити кошик</button>
           <div className="mt-5 flex items-end justify-between gap-4 border-t border-black/8 pt-5"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-muted">Разом, тестова сума</p><p className="mt-1 text-xs text-muted">Без доставки та оплати</p></div><p className="text-3xl font-black">{formatMoney(subtotal)}</p></div>
-          <button form="demo-checkout-form" type="submit" className="mt-6 inline-flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-neon px-5 text-sm font-black transition hover:bg-[#9ee000]">Підтвердити тестове оформлення <Check size={18} /></button>
+          <button form="demo-checkout-form" type="submit" disabled={isSubmitting} className="mt-6 inline-flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-neon px-5 text-sm font-black transition hover:bg-[#9ee000] disabled:cursor-wait disabled:opacity-60">{isSubmitting ? "Передаємо заявку…" : "Підтвердити тестове оформлення"} <Check size={18} /></button>
+          {submitError ? <p role="alert" aria-live="assertive" className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-bold leading-5 text-red-700">{submitError}</p> : null}
           <div className="mt-5 grid gap-3 text-xs leading-5 text-muted">
-            <p className="flex gap-2"><ShieldCheck className="mt-0.5 shrink-0 text-[#5f8500]" size={16} /> Дані залишаються тільки у відкритій сторінці до завершення демонстрації.</p>
+            <p className="flex gap-2"><ShieldCheck className="mt-0.5 shrink-0 text-[#5f8500]" size={16} /> Контакти й склад кошика передаються до Netlify Forms після підтвердження.</p>
             <p className="flex gap-2"><LockKeyhole className="mt-0.5 shrink-0 text-[#5f8500]" size={16} /> Карткові реквізити не запитуються.</p>
-            <p className="flex gap-2"><PackageCheck className="mt-0.5 shrink-0 text-[#5f8500]" size={16} /> Натискання очистить локальний кошик, але не створить замовлення.</p>
+            <p className="flex gap-2"><PackageCheck className="mt-0.5 shrink-0 text-[#5f8500]" size={16} /> Кошик очиститься тільки після успішної передачі тестової заявки.</p>
           </div>
         </aside>
       </div>
