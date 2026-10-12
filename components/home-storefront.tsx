@@ -223,8 +223,9 @@ export function HomeStorefront({ categories, products, sportsNews }: HomeStorefr
     <div className="min-h-screen overflow-x-hidden bg-mist">
       <header className="sticky top-0 z-50 border-b border-white/10 bg-black/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1460px] items-center gap-4 px-4 py-2 sm:px-6 lg:px-8">
-          <Link href="/" className="relative z-10 h-[82px] w-[138px] shrink-0 overflow-hidden sm:h-[112px] sm:w-[194px]" aria-label="GainLab — на головну">
-            <Image src="/brand/gainlab-logo.jpg" alt="GainLab — лабораторія твого прогресу" width={230} height={230} priority className="absolute -left-3 -top-8 h-[150px] w-[150px] max-w-none mix-blend-screen sm:-left-4 sm:-top-[44px] sm:h-[210px] sm:w-[210px]" />
+          <Link href="/" className="relative z-10 h-[94px] w-[166px] shrink-0 overflow-hidden sm:h-[112px] sm:w-[194px]" aria-label="GainLab — на головну">
+            <Image src="/brand/gainlab-logo.jpg" alt="GainLab — лабораторія твого прогресу" width={230} height={230} priority className="absolute -left-1.5 -top-[42px] h-[178px] w-[178px] max-w-none mix-blend-screen sm:-left-4 sm:-top-[44px] sm:h-[210px] sm:w-[210px]" />
+            <span className="absolute inset-x-0 bottom-0 bg-black py-1 text-center text-[7px] font-black uppercase leading-none tracking-[0.1em] text-white sm:hidden">Лабораторія твого прогресу</span>
           </Link>
           <label className="hidden h-12 flex-1 items-center overflow-hidden rounded-xl bg-white lg:flex">
             <Search className="ml-4 text-black/45" size={19} />
