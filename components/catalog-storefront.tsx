@@ -18,6 +18,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import type { DemoCatalogSection, DemoCategory, DemoProduct, DemoProductCategory, DemoProductSectionId } from "@/lib/demo-data";
+import { useDemoCart } from "@/components/demo-cart";
 
 type CatalogStorefrontProps = {
   categories: DemoCategory[];
@@ -117,6 +118,7 @@ function CatalogProductCard({
 }
 
 export function CatalogStorefront({ categories, sections, products, initialCategory, initialSection }: CatalogStorefrontProps) {
+  const { addItem, itemCount, openCart } = useDemoCart();
   const catalogCategories = categories.filter((category) => category.id !== "brands");
   const requestedSection = sections.find((section) => section.id === initialSection);
   const normalizedCategory = requestedSection?.categoryId ?? (catalogCategories.some((category) => category.id === initialCategory) ? (initialCategory as DemoProductCategory) : "all");
@@ -126,7 +128,6 @@ export function CatalogStorefront({ categories, sections, products, initialCateg
   const [query, setQuery] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("featured");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [cartCount, setCartCount] = useState(0);
   const [notice, setNotice] = useState("");
 
   const visibleProducts = useMemo(() => {
@@ -173,7 +174,7 @@ export function CatalogStorefront({ categories, sections, products, initialCateg
 
   const addToCart = (product: DemoProduct) => {
     if (product.stock === "out") return;
-    setCartCount((count) => count + 1);
+    addItem({ productId: product.id, option: product.packageLabel });
     notify(`${product.name} додано в тестовий кошик`);
   };
 
@@ -198,11 +199,11 @@ export function CatalogStorefront({ categories, sections, products, initialCateg
           <Link href="/" aria-label="GainLab — на головну" className="relative block h-[92px] w-40 shrink-0 overflow-hidden bg-ink sm:h-[124px] sm:w-[214px]">
             <Image src="/brand/gainlab-logo.jpg" alt="GainLab" width={720} height={720} className="absolute -left-3 -top-9 h-[172px] w-[172px] max-w-none mix-blend-screen sm:-left-[18px] sm:-top-[49px] sm:h-[230px] sm:w-[230px]" priority />
           </Link>
-          <div className="ml-auto flex items-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-bold">
+          <button type="button" onClick={openCart} aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`} className="ml-auto flex cursor-pointer items-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-bold transition hover:border-neon">
             <ShoppingCart className="text-neon" size={20} />
             <span className="hidden sm:inline">Тестовий кошик</span>
-            <span className="grid size-6 place-items-center rounded-full bg-neon text-xs text-ink">{cartCount}</span>
-          </div>
+            <span className="grid size-6 place-items-center rounded-full bg-neon text-xs text-ink">{itemCount}</span>
+          </button>
         </div>
       </header>
 

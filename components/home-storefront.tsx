@@ -31,6 +31,7 @@ import {
 import { catalogSections } from "@/lib/demo-data";
 import type { DemoCategory, DemoProduct, ProductTag } from "@/lib/demo-data";
 import type { SportNewsItem } from "@/lib/sports-news";
+import { useDemoCart } from "@/components/demo-cart";
 
 type HomeStorefrontProps = {
   categories: DemoCategory[];
@@ -180,9 +181,9 @@ function ProductCard({
 }
 
 export function HomeStorefront({ categories, products, sportsNews }: HomeStorefrontProps) {
+  const { addItem, itemCount, openCart } = useDemoCart();
   const [activeTab, setActiveTab] = useState<ProductTag>("hits");
   const [query, setQuery] = useState("");
-  const [cartCount, setCartCount] = useState(0);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [mobileOpen, setMobileOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
@@ -217,7 +218,7 @@ export function HomeStorefront({ categories, products, sportsNews }: HomeStorefr
   };
 
   const addToCart = (product: DemoProduct) => {
-    setCartCount((count) => count + 1);
+    addItem({ productId: product.id, option: product.packageLabel });
     notify(`${product.name} додано в демонстраційний кошик`);
   };
 
@@ -237,7 +238,7 @@ export function HomeStorefront({ categories, products, sportsNews }: HomeStorefr
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
             <button type="button" onClick={() => notify("Особистий кабінет буде реалізовано на наступному етапі")} className="hidden cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold hover:bg-white/8 md:flex"><CircleUserRound size={20} /> Увійти</button>
             <button type="button" onClick={() => notify(`В обраному: ${favorites.size}`)} className="relative grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label="Обране"><Heart size={22} />{favorites.size > 0 ? <span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{favorites.size}</span> : null}</button>
-            <button type="button" onClick={() => notify(`У демонстраційному кошику: ${cartCount}`)} className="relative grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label="Кошик"><ShoppingCart size={22} />{cartCount > 0 ? <span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{cartCount}</span> : null}</button>
+            <button type="button" onClick={openCart} className="relative grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`}><ShoppingCart size={22} />{itemCount > 0 ? <span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{itemCount}</span> : null}</button>
             <button type="button" onClick={() => setMobileOpen((value) => !value)} className="grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8 lg:hidden" aria-label="Відкрити меню">{mobileOpen ? <X size={24} /> : <Menu size={24} />}</button>
           </div>
         </div>

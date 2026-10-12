@@ -20,6 +20,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import type { DemoProduct, DemoProductCategory } from "@/lib/demo-data";
+import { useDemoCart } from "@/components/demo-cart";
 
 type ProductDetailProps = {
   product: DemoProduct;
@@ -53,6 +54,7 @@ const stockLabels = {
 const formatMoney = (value: number) => `${String(value).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0")} ₴`;
 
 export function ProductDetail({ product, categoryName, sectionName, similarProducts }: ProductDetailProps) {
+  const { addItem, itemCount, openCart } = useDemoCart();
   const ProductIcon = categoryIcons[product.categoryId];
   const tone = toneStyles[product.artTone];
   const [selectedOption, setSelectedOption] = useState(product.options?.[0] ?? product.packageLabel);
@@ -67,6 +69,7 @@ export function ProductDetail({ product, categoryName, sectionName, similarProdu
 
   const addToCart = () => {
     if (product.stock === "out") return;
+    addItem({ productId: product.id, option: selectedOption, quantity });
     notify(`${quantity} × ${product.name} (${selectedOption}) додано в тестовий кошик`);
   };
 
@@ -77,9 +80,15 @@ export function ProductDetail({ product, categoryName, sectionName, similarProdu
           <Link href="/" aria-label="GainLab — на головну" className="relative block h-[92px] w-40 shrink-0 overflow-hidden bg-ink sm:h-[124px] sm:w-[214px]">
             <Image src="/brand/gainlab-logo.jpg" alt="GainLab" width={720} height={720} className="absolute -left-3 -top-9 h-[172px] w-[172px] max-w-none mix-blend-screen sm:-left-[18px] sm:-top-[49px] sm:h-[230px] sm:w-[230px]" priority />
           </Link>
-          <Link href="/catalog" className="ml-auto inline-flex items-center gap-2 rounded-2xl border border-white/12 bg-white/5 px-4 py-3 text-sm font-black transition hover:border-neon hover:text-neon">
-            <Boxes size={19} /> <span className="hidden sm:inline">До каталогу</span>
-          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            <Link href="/catalog" className="inline-flex size-12 items-center justify-center rounded-2xl border border-white/12 bg-white/5 text-sm font-black transition hover:border-neon hover:text-neon sm:h-12 sm:w-auto sm:px-4">
+              <Boxes size={19} /> <span className="hidden sm:ml-2 sm:inline">До каталогу</span>
+            </Link>
+            <button type="button" onClick={openCart} aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`} className="relative grid size-12 cursor-pointer place-items-center rounded-2xl border border-white/12 bg-white/5 transition hover:border-neon hover:text-neon">
+              <ShoppingCart size={20} />
+              {itemCount > 0 ? <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{itemCount}</span> : null}
+            </button>
+          </div>
         </div>
       </header>
 
