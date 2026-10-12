@@ -68,7 +68,6 @@ export function ProductDetail({ product, categoryName, sectionName, similarProdu
   const addToCart = () => {
     if (product.stock === "out") return;
     addItem({ productId: product.id, option: selectedOption, quantity });
-    notify(`${quantity} × ${product.name} (${selectedOption}) додано в тестовий кошик`);
   };
 
   return (

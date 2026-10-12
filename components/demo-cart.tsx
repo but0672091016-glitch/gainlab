@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { ArrowRight, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
 import { products, type DemoProduct } from "@/lib/demo-data";
 import {
   addDemoCartLine,
@@ -105,6 +105,7 @@ const DemoCartContext = createContext<DemoCartContextValue | null>(null);
 export function DemoCartProvider({ children }: { children: ReactNode }) {
   const lines = useSyncExternalStore(subscribeToCart, getCartSnapshot, getServerCartSnapshot);
   const [isOpen, setIsOpen] = useState(false);
+  const [cartNotice, setCartNotice] = useState("");
   const detailedLines = useMemo(() => lines.flatMap((line) => {
     const product = products.find((item) => item.id === line.productId);
     return product ? [{ ...line, product }] : [];
@@ -135,21 +136,34 @@ export function DemoCartProvider({ children }: { children: ReactNode }) {
       const product = products.find((item) => item.id === input.productId);
       if (!product || product.stock === "out") return;
       replaceCart(addDemoCartLine(cartSnapshot, input));
+      const quantity = input.quantity ?? 1;
+      setCartNotice(`${quantity > 1 ? `${quantity} × ` : ""}${product.name} додано до кошика`);
     },
     setLineQuantity: (key, quantity) => replaceCart(setDemoCartLineQuantity(cartSnapshot, key, quantity)),
     removeLine: (key) => replaceCart(removeDemoCartLine(cartSnapshot, key)),
     clearCart: () => replaceCart([]),
-    openCart: () => setIsOpen(true),
+    openCart: () => {
+      setCartNotice("");
+      setIsOpen(true);
+    },
     closeCart: () => setIsOpen(false),
   }), [detailedLines, isOpen, itemCount, subtotal]);
 
   return (
     <DemoCartContext.Provider value={value}>
       {children}
+      {cartNotice && !isOpen ? (
+        <div role="status" aria-live="polite" className="fixed inset-x-4 bottom-5 z-[90] mx-auto flex max-w-lg items-center gap-3 rounded-2xl border border-neon/35 bg-ink p-3 text-white shadow-[0_18px_60px_rgba(0,0,0,.38)] sm:inset-x-auto sm:left-1/2 sm:w-[calc(100%-2rem)] sm:-translate-x-1/2">
+          <CheckCircle2 className="shrink-0 text-neon" size={22} />
+          <p className="min-w-0 flex-1 text-xs font-bold leading-5 sm:text-sm">{cartNotice}</p>
+          <button type="button" onClick={() => { setCartNotice(""); setIsOpen(true); }} className="shrink-0 cursor-pointer rounded-xl bg-neon px-3 py-2 text-xs font-black text-ink transition hover:bg-[#9ee000]">Відкрити кошик</button>
+          <button type="button" onClick={() => setCartNotice("")} className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-xl text-white/65 transition hover:bg-white/10 hover:text-white" aria-label="Закрити повідомлення"><X size={18} /></button>
+        </div>
+      ) : null}
       {isOpen ? (
         <div className="fixed inset-0 z-[100]">
           <button type="button" className="absolute inset-0 cursor-default bg-black/65 backdrop-blur-sm" onClick={() => setIsOpen(false)} aria-label="Закрити тестовий кошик" />
-          <aside role="dialog" aria-modal="true" aria-labelledby="demo-cart-title" className="absolute right-0 top-0 flex h-full w-full max-w-[480px] flex-col bg-white shadow-[-28px_0_80px_rgba(0,0,0,.28)]">
+          <aside id="demo-cart-panel" role="dialog" aria-modal="true" aria-labelledby="demo-cart-title" className="absolute right-0 top-0 flex h-full w-full max-w-[480px] flex-col bg-white shadow-[-28px_0_80px_rgba(0,0,0,.28)]">
             <div className="flex items-center justify-between border-b border-black/8 px-5 py-5 sm:px-6">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#5f8500]">Демонстраційний режим</p>

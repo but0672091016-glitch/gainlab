@@ -175,7 +175,6 @@ export function CatalogStorefront({ categories, sections, products, initialCateg
   const addToCart = (product: DemoProduct) => {
     if (product.stock === "out") return;
     addItem({ productId: product.id, option: product.packageLabel });
-    notify(`${product.name} додано в тестовий кошик`);
   };
 
   const resetFilters = () => {

@@ -203,7 +203,6 @@ export function HomeStorefront({ categories, products, sportsNews }: HomeStorefr
 
   const addToCart = (product: DemoProduct) => {
     addItem({ productId: product.id, option: product.packageLabel });
-    notify(`${product.name} додано в демонстраційний кошик`);
   };
 
   return (

@@ -20,7 +20,7 @@ import { catalogSections, categories } from "@/lib/demo-data";
 
 export function StoreHeader() {
   const router = useRouter();
-  const { itemCount, openCart } = useDemoCart();
+  const { isOpen, itemCount, openCart } = useDemoCart();
   const [query, setQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
@@ -44,6 +44,11 @@ export function StoreHeader() {
     setMobileOpen(false);
   };
 
+  const showCart = () => {
+    closeMenus();
+    openCart();
+  };
+
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-white/10 bg-black/95 text-white backdrop-blur-xl">
@@ -63,7 +68,7 @@ export function StoreHeader() {
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
             <button type="button" onClick={() => notify("Особистий кабінет буде реалізовано на наступному етапі")} className="hidden cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold hover:bg-white/8 md:flex"><CircleUserRound size={20} /> Увійти</button>
             <button type="button" onClick={() => notify("Збереження обраного буде реалізовано на наступному етапі")} className="grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label="Обране"><Heart size={22} /></button>
-            <button type="button" onClick={openCart} className="relative grid size-11 cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`}>
+            <button type="button" onClick={showCart} aria-expanded={isOpen} aria-controls="demo-cart-panel" className="relative grid size-11 touch-manipulation cursor-pointer place-items-center rounded-xl hover:bg-white/8" aria-label={`Відкрити тестовий кошик, товарів: ${itemCount}`}>
               <ShoppingCart size={22} />
               {itemCount > 0 ? <span className="absolute right-0 top-0 grid size-5 place-items-center rounded-full bg-neon text-[10px] font-black text-ink">{itemCount}</span> : null}
             </button>
