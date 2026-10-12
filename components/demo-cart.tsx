@@ -4,7 +4,7 @@ import Link from "next/link";
 import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { ArrowRight, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
-import { products } from "@/lib/demo-data";
+import { products, type DemoProduct } from "@/lib/demo-data";
 import {
   addDemoCartLine,
   removeDemoCartLine,
@@ -85,10 +85,17 @@ function replaceCart(next: DemoCartLine[]) {
   emitCartChange();
 }
 
+export type DemoCartDetailedLine = DemoCartLine & { product: DemoProduct };
+
 type DemoCartContextValue = {
+  lines: DemoCartDetailedLine[];
   itemCount: number;
+  subtotal: number;
   isOpen: boolean;
   addItem: (input: DemoCartInput) => void;
+  setLineQuantity: (key: string, quantity: number) => void;
+  removeLine: (key: string) => void;
+  clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
 };
@@ -120,16 +127,21 @@ export function DemoCartProvider({ children }: { children: ReactNode }) {
   }, [isOpen]);
 
   const value = useMemo<DemoCartContextValue>(() => ({
+    lines: detailedLines,
     itemCount,
+    subtotal,
     isOpen,
     addItem: (input) => {
       const product = products.find((item) => item.id === input.productId);
       if (!product || product.stock === "out") return;
       replaceCart(addDemoCartLine(cartSnapshot, input));
     },
+    setLineQuantity: (key, quantity) => replaceCart(setDemoCartLineQuantity(cartSnapshot, key, quantity)),
+    removeLine: (key) => replaceCart(removeDemoCartLine(cartSnapshot, key)),
+    clearCart: () => replaceCart([]),
     openCart: () => setIsOpen(true),
     closeCart: () => setIsOpen(false),
-  }), [isOpen, itemCount]);
+  }), [detailedLines, isOpen, itemCount, subtotal]);
 
   return (
     <DemoCartContext.Provider value={value}>
@@ -182,8 +194,8 @@ export function DemoCartProvider({ children }: { children: ReactNode }) {
                     </div>
                     <span className="rounded-full bg-neon px-3 py-1.5 text-xs font-black">{itemCount} шт.</span>
                   </div>
-                  <p className="mt-4 text-xs leading-5 text-muted">Оформлення та оплата ще не підключені. Кошик зберігається лише у браузері цього пристрою.</p>
-                  <button type="button" disabled className="mt-4 inline-flex h-14 w-full cursor-not-allowed items-center justify-center gap-2 rounded-2xl bg-black/10 text-sm font-black text-black/40">Оформлення — наступний етап</button>
+                  <p className="mt-4 text-xs leading-5 text-muted">Тестове оформлення не створює реального замовлення і не проводить оплату. Кошик зберігається лише у браузері цього пристрою.</p>
+                  <Link href="/checkout" onClick={() => setIsOpen(false)} className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-neon text-sm font-black text-ink transition hover:bg-[#9ee000]">Перейти до тестового оформлення <ArrowRight size={18} /></Link>
                 </div>
               </>
             ) : (
