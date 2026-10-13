@@ -219,5 +219,5 @@ function escapeHtml(value) {
 }
 
 function textResponse(message) {
-  return ContentService.createTextOutput(message).setMimeType(ContentService.MimeType.TEXT);
+  return HtmlService.createHtmlOutput(escapeHtml(message));
 }
