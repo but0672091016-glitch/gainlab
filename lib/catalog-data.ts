@@ -58,7 +58,7 @@ async function readDatabaseCatalog(connectionString: string): Promise<StoreCatal
 }
 
 export const getStoreCatalog = cache(async (): Promise<StoreCatalog> => {
-  const connectionString = process.env.DATABASE_URL?.trim();
+  const connectionString = process.env.DATABASE_URL?.trim() || process.env.NETLIFY_DB_URL?.trim();
   if (!connectionString) return demoCatalog;
 
   try {
