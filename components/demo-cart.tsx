@@ -4,7 +4,7 @@ import Link from "next/link";
 import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { ArrowRight, CheckCircle2, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react";
-import { products, type DemoProduct } from "@/lib/demo-data";
+import type { DemoProduct } from "@/lib/demo-data";
 import {
   addDemoCartLine,
   removeDemoCartLine,
@@ -36,8 +36,7 @@ function readStoredCart(): DemoCartLine[] {
         && typeof candidate.quantity === "number"
         && Number.isInteger(candidate.quantity)
         && candidate.quantity > 0
-        && candidate.quantity <= 99
-        && products.some((product) => product.id === candidate.productId);
+        && candidate.quantity <= 99;
     });
   } catch {
     return [];
@@ -102,15 +101,15 @@ type DemoCartContextValue = {
 
 const DemoCartContext = createContext<DemoCartContextValue | null>(null);
 
-export function DemoCartProvider({ children }: { children: ReactNode }) {
+export function DemoCartProvider({ children, products }: { children: ReactNode; products: DemoProduct[] }) {
   const lines = useSyncExternalStore(subscribeToCart, getCartSnapshot, getServerCartSnapshot);
   const [isOpen, setIsOpen] = useState(false);
   const [cartNotice, setCartNotice] = useState("");
   const detailedLines = useMemo(() => lines.flatMap((line) => {
     const product = products.find((item) => item.id === line.productId);
     return product ? [{ ...line, product }] : [];
-  }), [lines]);
-  const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0);
+  }), [lines, products]);
+  const itemCount = detailedLines.reduce((sum, line) => sum + line.quantity, 0);
   const subtotal = detailedLines.reduce((sum, line) => sum + line.product.price * line.quantity, 0);
 
   useEffect(() => {
@@ -147,7 +146,7 @@ export function DemoCartProvider({ children }: { children: ReactNode }) {
       setIsOpen(true);
     },
     closeCart: () => setIsOpen(false),
-  }), [detailedLines, isOpen, itemCount, subtotal]);
+  }), [detailedLines, isOpen, itemCount, products, subtotal]);
 
   return (
     <DemoCartContext.Provider value={value}>

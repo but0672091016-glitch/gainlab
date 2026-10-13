@@ -1,5 +1,5 @@
 import { CatalogStorefront } from "@/components/catalog-storefront";
-import { catalogSections, categories, products } from "@/lib/demo-data";
+import { getStoreCatalog } from "@/lib/catalog-data";
 import { Suspense } from "react";
 
 async function CatalogContent({
@@ -8,8 +8,9 @@ async function CatalogContent({
   searchParams: Promise<{ category?: string; section?: string; query?: string }>;
 }) {
   const { category, section, query } = await searchParams;
+  const catalog = await getStoreCatalog();
 
-  return <CatalogStorefront key={`${category ?? "all"}:${section ?? "all"}:${query ?? ""}`} categories={categories} sections={catalogSections} products={products} initialCategory={category} initialSection={section} initialQuery={query} />;
+  return <CatalogStorefront key={`${category ?? "all"}:${section ?? "all"}:${query ?? ""}`} categories={catalog.categories} sections={catalog.sections} products={catalog.products} initialCategory={category} initialSection={section} initialQuery={query} />;
 }
 
 function CatalogFallback() {

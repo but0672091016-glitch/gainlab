@@ -1,10 +1,10 @@
 import { HomeStorefront } from "@/components/home-storefront";
-import { categories, products } from "@/lib/demo-data";
+import { getStoreCatalog } from "@/lib/catalog-data";
 import { getSportsNews } from "@/lib/sports-news";
 
 export default async function Home() {
-  const sportsNews = await getSportsNews();
-  const featuredProducts = products.filter((product) => product.categoryId === "nutrition");
+  const [sportsNews, catalog] = await Promise.all([getSportsNews(), getStoreCatalog()]);
+  const featuredProducts = catalog.products.filter((product) => product.categoryId === "nutrition");
 
-  return <HomeStorefront categories={categories} products={featuredProducts} sportsNews={sportsNews} />;
+  return <HomeStorefront categories={catalog.categories} products={featuredProducts} sportsNews={sportsNews} />;
 }

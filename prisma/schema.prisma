@@ -24,13 +24,31 @@ model Category {
   id          String    @id @default(cuid())
   slug        String    @unique
   name        String
+  eyebrow     String?
   description String?
   imageUrl    String?
   position    Int       @default(0)
   isActive    Boolean   @default(true)
   products    Product[]
+  sections    CatalogSection[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model CatalogSection {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  position    Int       @default(0)
+  isActive    Boolean   @default(true)
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([categoryId, position])
 }
 
 model Brand {
@@ -51,6 +69,7 @@ model Product {
   name             String
   description      String?
   packageLabel     String?
+  optionLabel      String?
   price            Decimal           @db.Decimal(12, 2)
   oldPrice         Decimal?          @db.Decimal(12, 2)
   stock            Int               @default(0)
@@ -59,9 +78,13 @@ model Product {
   isFeatured       Boolean           @default(false)
   isRecommended    Boolean           @default(false)
   isNew            Boolean           @default(false)
+  artLabel         String?
+  artTone          String             @default("silver")
   categoryId       String
+  sectionId        String
   brandId          String
   category         Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  section          CatalogSection    @relation(fields: [sectionId], references: [id], onDelete: Restrict)
   brand            Brand             @relation(fields: [brandId], references: [id], onDelete: Restrict)
   images           ProductImage[]
   variants         ProductVariant[]
@@ -70,6 +93,7 @@ model Product {
   updatedAt        DateTime           @updatedAt
 
   @@index([categoryId, status])
+  @@index([sectionId, status])
   @@index([brandId, status])
 }
 
@@ -91,6 +115,7 @@ model ProductVariant {
   value      String
   priceDelta Decimal @default(0) @db.Decimal(12, 2)
   stock      Int     @default(0)
+  position   Int     @default(0)
   productId  String
   product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 

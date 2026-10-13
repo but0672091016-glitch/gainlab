@@ -16,9 +16,9 @@ import {
   X,
 } from "lucide-react";
 import { useDemoCart } from "@/components/demo-cart";
-import { catalogSections, categories } from "@/lib/demo-data";
+import type { DemoCatalogSection, DemoCategory } from "@/lib/demo-data";
 
-export function StoreHeader() {
+export function StoreHeader({ categories, sections }: { categories: DemoCategory[]; sections: DemoCatalogSection[] }) {
   const router = useRouter();
   const { isOpen, itemCount, openCart } = useDemoCart();
   const [query, setQuery] = useState("");
@@ -94,7 +94,7 @@ export function StoreHeader() {
                   <section key={category.id} aria-labelledby={`menu-${category.id}`}>
                     <Link id={`menu-${category.id}`} href={category.href} onClick={closeMenus} className="flex items-center justify-between border-b border-white/10 pb-3 text-sm font-black text-neon hover:text-white">{category.name}<ChevronRight size={16} /></Link>
                     <div className="mt-3 grid gap-1">
-                      {catalogSections.filter((section) => section.categoryId === category.id).map((section) => (
+                      {sections.filter((section) => section.categoryId === category.id).map((section) => (
                         <Link key={section.id} href={section.href} onClick={closeMenus} className="group rounded-xl px-3 py-2 transition hover:bg-white/6">
                           <span className="block text-sm font-bold text-white/82 group-hover:text-neon">{section.name}</span>
                           <span className="mt-0.5 block text-[11px] leading-4 text-white/38">{section.description}</span>
@@ -118,7 +118,7 @@ export function StoreHeader() {
               <button type="button" onClick={() => setCatalogOpen((value) => !value)} aria-expanded={catalogOpen} aria-controls="mobile-catalog-menu" className="mt-3 flex w-full cursor-pointer items-center justify-between rounded-xl bg-neon px-4 py-3 text-sm font-black text-ink">Каталог товарів <ChevronRight className={`transition-transform ${catalogOpen ? "rotate-90" : ""}`} size={17} /></button>
               {catalogOpen ? (
                 <div id="mobile-catalog-menu" className="mt-2 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/5 p-2">
-                  {catalogSections.filter((section) => section.categoryId === "nutrition").map((section) => <Link key={section.id} href={section.href} onClick={closeMenus} className="rounded-xl px-3 py-2 text-xs font-bold text-white/82 hover:bg-white/8 hover:text-neon">{section.name}</Link>)}
+                  {sections.filter((section) => section.categoryId === "nutrition").map((section) => <Link key={section.id} href={section.href} onClick={closeMenus} className="rounded-xl px-3 py-2 text-xs font-bold text-white/82 hover:bg-white/8 hover:text-neon">{section.name}</Link>)}
                 </div>
               ) : null}
               <div className="mt-3 grid gap-1">{categories.map((category) => <Link key={category.id} href={category.href} onClick={closeMenus} className="rounded-xl px-3 py-3 text-sm font-bold text-white/85 hover:bg-white/8 hover:text-neon">{category.name}</Link>)}</div>

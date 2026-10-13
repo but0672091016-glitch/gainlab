@@ -34,7 +34,7 @@ export type DemoProduct = {
   tags: ProductTag[];
   artLabel: string;
   artTone: "lime" | "blue" | "orange" | "silver" | "violet" | "red";
-  isDemo: true;
+  isDemo: boolean;
 };
 
 export type DemoCategory = {
